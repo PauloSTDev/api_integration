@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 void main() {
   runApp(const MyApp());
@@ -31,12 +34,78 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  void getAPI() async {
+    final client = http.Client();
+    try {
+      // API call
+      var response = await client.get(Uri.parse('https://jsonplaceholder.typicode.com/posts'));
+      var decodedResponse = jsonDecode(response.body);
+      print(decodedResponse);
+    } catch (e) {
+      print(e);
+    } finally {
+      client.close();
+    }
+  }
 
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
+  void postAPI(String title, String body) async {
+    final client = http.Client();
+    final request = {
+      'title': title,
+      'body': body,
+      'userId': '111',
+    };
+    try {
+      var response = await client.post(Uri.parse('https://jsonplaceholder.typicode.com/posts'), body: request);
+      if (response.statusCode == 200) {
+        print('Post created successfully');
+        // return model.fromJson(json.decode(response.body));
+      } else {
+        print('Failed to create post');
+      }
+    } catch (e) {
+      print(e);
+    } finally {
+      client.close();
+    }
+  }
+
+  void updateAPI(String title, String body) async {
+    final client = http.Client();
+    final request = {
+      'title': title,
+      'body': body,
+      'userId': '111',
+    };
+    try {
+      var response = await client.put(Uri.parse('https://jsonplaceholder.typicode.com/posts'), body: request);
+      if (response.statusCode == 200) {
+        print('Post created successfully');
+        // return model.fromJson(json.decode(response.body));
+      } else {
+        print('Failed to create post');
+      }
+    } catch (e) {
+      print(e);
+    } finally {
+      client.close();
+    }
+  }
+
+  void deleteAPI(int id) async {
+    final client = http.Client();
+    try {
+      var response = await client.delete(Uri.parse('https://jsonplaceholder.typicode.com/posts/$id'));
+      if (response.statusCode == 200) {
+        print('Post deleted successfully');
+      } else {
+        print('Failed to delete post');
+      }
+    } catch (e) {
+      print(e);
+    } finally {
+      client.close();
+    }
   }
 
   @override
@@ -49,24 +118,16 @@ class _MyHomePageState extends State<MyHomePage> {
         centerTitle: true,
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
+        child: Text(
+          'API Integration',
+          style: Theme.of(context).textTheme.headlineMedium,
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
+        onPressed: () => getAPI(),
         tooltip: 'Increment',
         child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      ),
     );
   }
 }
